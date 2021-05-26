@@ -17,3 +17,23 @@ jobs:
           make dist
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: dist/protoc-gen-doc-1.4.1.darwin-amd64.go1.15.12.tar.gz
+          asset_name: protoc-gen-doc.tar.gz
+          asset_content_type: application/zip
